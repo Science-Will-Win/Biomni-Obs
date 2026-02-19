@@ -1,0 +1,41 @@
+services:
+  # 1. Postgres (메타데이터 및 트레이스 저장)
+  langfuse-db:
+    image: postgres:16
+    container_name: langfuse-db
+    restart: always
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse_pass
+      - POSTGRES_DB=langfuse
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  # 2. Langfuse v2 Server
+  langfuse:
+    image: langfuse/langfuse:2  # v2 최신 버전 고정
+    container_name: langfuse
+    restart: always
+    depends_on:
+      - langfuse-db
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://langfuse:langfuse_pass@langfuse-db:5432/langfuse
+      - NEXTAUTH_SECRET=secret_1234
+      - NEXTAUTH_URL=http://34.22.66.185:3000
+      - LANGFUSE_INIT_ORG_NAME=Biomni
+      - LANGFUSE_INIT_USER_EMAIL=admin@biomni.com
+      - LANGFUSE_INIT_USER_PASSWORD=admin_pass
+      - TELEMETRY_ENABLED=false
+      - SALT=biomni_secure_salt_string_2026_0206
+
+  # 3. Arize Phoenix (기존 유지)
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: phoenix
+    restart: always
+    ports:
+      - "6006:6006"
+      - "4317:4317"

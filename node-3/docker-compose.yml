@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # 0. OTel Collector (데이터 수집 및 라우팅 - 추가됨)
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    user: "0:0"
+    command: ["--config=/etc/otelcol-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-config.yaml
+    ports:
+      - "4317:4317" # Node 1에서 이 포트로 데이터를 보냅니다
+      - "4318:4318"
+      - "8889:8889" # Prometheus가 메트릭을 가져갈 포트
+    depends_on:
+      - tempo
+      - loki
+
+  # 1. Prometheus (메트릭)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+
+  # 2. Tempo (트레이싱)
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - ./tempo-data:/var/tempo
+    ports:
+      - "3200:3200"
+      # "4317:4317" 포트 삭제 (Collector와 충돌 방지)
+    depends_on:
+      - minio
+
+  # 3. Grafana (시각화)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  # 4. MinIO (저장소)
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minio_admin
+      - MINIO_ROOT_PASSWORD=minio_pass
+
+  # 5. Loki (로그)
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki.yaml:/etc/loki/local-config.yaml
+      - ./loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    depends_on:
+      - minio
