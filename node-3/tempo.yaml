@@ -1,20 +1,21 @@
 server:
   http_listen_port: 3200
-  grpc_listen_port: 9095
 
 distributor:
   receivers:
     otlp:
       protocols:
         grpc:
-          endpoint: "0.0.0.0:4317" # 내부망에서 수신
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
 
 ingester:
   lifecycler:
     ring:
-      replication_factor: 1  # 나 혼자 일하겠다는 뜻 (Ring 에러 해결)
+      replication_factor: 1
       kvstore:
-        store: inmemory      # 메모리에서 관리
+        store: inmemory
 
 storage:
   trace:

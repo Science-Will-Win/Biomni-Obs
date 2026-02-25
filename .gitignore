@@ -1,4 +1,4 @@
 test
 .env
-./node-3/loki-data
-./node-3/tempo-data
+loki-data
+tempo-data
