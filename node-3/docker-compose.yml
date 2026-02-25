@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 0. OTel Collector (데이터 수집 및 라우팅 - 추가됨)
+  # 0. OTel Collector (데이터 수집 및 라우팅)
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
@@ -38,11 +38,10 @@ services:
       - ./tempo-data:/var/tempo
     ports:
       - "3200:3200"
-      # "4317:4317" 포트 삭제 (Collector와 충돌 방지)
     depends_on:
       - minio
 
-  # 3. Grafana (시각화)
+  # 3. Grafana (시각화) - 자동 프로비저닝 추가됨
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -50,6 +49,13 @@ services:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      # 위에서 만든 datasource 파일을 컨테이너 내부로 매핑
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
 
   # 4. MinIO (저장소)
   minio:
