@@ -5,6 +5,11 @@ chmod +x setup_node1.sh
 설치 및 빌드가 완료되면 서버의 8000번 포트로 설치가 정상적으로 이루어졌는지 확인
 http://<IP주소>:8000/docs 로 들어갔을 때 swagger UI가 보이면 정상적으로 완료된 것
 
+도커 이미지 빌드
+cd /raid/sww/Biomni-Web
+docker build -t biomni-base:latest -f backend/Dockerfile.base backend/
+docker compose up -d --build --force-recreate
+
 UI 띄우기 위해 아래 명령어 실행
 cd Biomni-Web/frontend/
 npm run dev -- --host
