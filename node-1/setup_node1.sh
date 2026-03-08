@@ -96,15 +96,19 @@ EOF
     echo "⚠️  WARNING: A dummy .env file has been created."
 fi
 
-# 6. Docker Compose 실행 (백엔드 - No Cache 적용)
-echo "5️⃣  Building and Starting Backend (Docker)..."
+# 6. Docker Base Image 빌드 및 Compose 실행
+echo "5️⃣  Building Base Image and Starting Backend (Docker)..."
 
 # 윈도우 줄바꿈(CRLF) 찌꺼기 제거 및 권한 부여
 sed -i 's/\r$//' backend/entrypoint.sh 2>/dev/null || true
 chmod +x backend/entrypoint.sh
 
+# [추가된 부분] Dockerfile.base를 사용하여 biomni-base 이미지 먼저 빌드
+echo "   Building Docker base image (biomni-base:latest)..."
+docker build --no-cache -t biomni-base:latest -f backend/Dockerfile.base backend/
+
 # sudo 없이 유저 권한으로 캐시를 100% 무시하고 깨끗하게 빌드 후 실행
-echo "   Building Docker image with --no-cache..."
+echo "   Building main Docker image with --no-cache..."
 docker compose build --no-cache
 docker compose up -d
 

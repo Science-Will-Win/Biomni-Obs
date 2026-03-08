@@ -40,7 +40,7 @@ nohup env CUDA_VISIBLE_DEVICES=$TARGET_GPUS python -m sglang.launch_server \
   --mem-fraction-static 0.9 \
   --tp 2 \
   --trust-remote-code \
-  --context-length 65536 \
+  --context-length 131072 \
   --json-model-override-args '{"rope_scaling":{"rope_type":"yarn","factor":1.0,"original_max_position_embeddings":32768}, "max_position_embeddings": 131072}' \
   > sglang_server.log 2>&1 &
 
