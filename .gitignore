@@ -3,3 +3,4 @@ test
 loki-data
 tempo-data
 */pgdata
+*/__pycache__
