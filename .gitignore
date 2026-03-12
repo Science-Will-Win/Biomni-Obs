@@ -2,3 +2,5 @@ test
 .env
 loki-data
 tempo-data
+*/pgdata
+*/__pycache__
