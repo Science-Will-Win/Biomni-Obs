@@ -25,7 +25,7 @@ services:
       - DATABASE_URL=postgresql://langfuse:langfuse_pass@langfuse-db:5432/langfuse
       - NEXTAUTH_SECRET=secret_1234
       # ⬇️ 이 부분의 IP를 변경해야 합니다.
-      - NEXTAUTH_URL=http://211.206.241.242:3000
+      - NEXTAUTH_URL=http://localhost:3000
       - LANGFUSE_INIT_ORG_NAME=Biomni
       - LANGFUSE_INIT_USER_EMAIL=admin@biomni.com
       - LANGFUSE_INIT_USER_PASSWORD=admin_pass
