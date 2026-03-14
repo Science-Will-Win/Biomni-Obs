@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  # 1. Postgres (메타데이터 및 트레이스 저장)
+  # 1. Postgres (Grafana 연동을 위해 포트 5432 개방)
   langfuse-db:
     image: postgres:16
     container_name: langfuse-db
@@ -8,12 +10,14 @@ services:
       - POSTGRES_USER=langfuse
       - POSTGRES_PASSWORD=langfuse_pass
       - POSTGRES_DB=langfuse
+    ports:
+      - "5432:5432" # Node 3의 Grafana가 접근할 수 있도록 포트 개방
     volumes:
       - ./pgdata:/var/lib/postgresql/data
 
   # 2. Langfuse v2 Server
   langfuse:
-    image: langfuse/langfuse:2  # v2 최신 버전 고정
+    image: langfuse/langfuse:2
     container_name: langfuse
     restart: always
     depends_on:
@@ -24,19 +28,11 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://langfuse:langfuse_pass@langfuse-db:5432/langfuse
       - NEXTAUTH_SECRET=secret_1234
-      # ⬇️ 이 부분의 IP를 변경해야 합니다.
-      - NEXTAUTH_URL=http://211.206.241.242:3000
+      - NEXTAUTH_URL=http://localhost:3000 # Aigen 서버에서는 - NEXTAUTH_URL=http://211.206.241.242:3000
       - LANGFUSE_INIT_ORG_NAME=Biomni
       - LANGFUSE_INIT_USER_EMAIL=admin@biomni.com
       - LANGFUSE_INIT_USER_PASSWORD=admin_pass
       - TELEMETRY_ENABLED=false
       - SALT=biomni_secure_salt_string_2026_0206
 
-  # 3. Arize Phoenix (기존 유지)
-  phoenix:
-    image: arizephoenix/phoenix:latest
-    container_name: phoenix
-    restart: always
-    ports:
-      - "6006:6006"
-      - "4317:4317"
+  # 3. Arize Phoenix 부분은 삭제합니다.
