@@ -4,7 +4,8 @@ datasources:
   - name: Langfuse-Postgres
     type: postgres
     # [중요] url 대신 host를 사용해야 합니다.
-    host: 172.17.0.1:5432
+    uid: P7ADA57E05D83D984
+    host: host.docker.internal:5432
     # 쿼리 에러를 방지하기 위해 database 필드를 명확히 작성합니다.
     database: langfuse
     user: langfuse

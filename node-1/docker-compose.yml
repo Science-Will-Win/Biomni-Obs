@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  aigen-backend:
+    image: jiyeonl/biomni-web_backend:latest # [핵심] 도커 허브 이미지 사용
+    container_name: aigen-backend
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/biomni_repo:/app/backend_code:$PYTHONPATH
+      - BIOMNI_DATA_PATH=/app/data
+    volumes:
+      # [핵심] 소스 코드 마운트는 전부 제거! (이미지 안에 있으니까요)
+      # 결과물 저장을 위한 데이터 폴더들만 마운트합니다.
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+      - ./reasoning_logs:/app/reasoning_logs
+      - ./models:/app/models
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8003:8000"
+    depends_on:
+      - aigen-db
+    restart: unless-stopped
+
+  aigen-db:
+    image: postgres:16-alpine
+    container_name: aigen-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=aigen
+      - POSTGRES_PASSWORD=aigen_pass
+      - POSTGRES_DB=aigen
+    volumes:
+      - aigen-pgdata:/var/lib/postgresql/data
+
+  vllm-server:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-server
+    runtime: nvidia
+    ports:
+      - "30000:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    command: >
+      --model /app/models/Ministral-3-3B-Reasoning-2512
+      --served-model-name ministral-reasoning
+      --port 8000
+      --host 0.0.0.0
+      --max-model-len 65536
+    restart: unless-stopped
+
+volumes:
+  aigen-pgdata:

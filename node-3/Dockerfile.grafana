@@ -1,0 +1,20 @@
+# 베이스 이미지
+FROM grafana/grafana:latest
+
+# root 권한으로 파일 복사 및 권한 설정
+USER root
+
+# 1. 데이터소스 프로비저닝 파일 복사
+COPY grafana-datasources.yml /etc/grafana/provisioning/datasources/datasources.yml
+
+# 2. 대시보드 프로비저닝 설정 파일 복사
+COPY grafana-dashboards.yml /etc/grafana/provisioning/dashboards/dashboards.yml
+
+# 3. 실제 대시보드 JSON 파일들이 있는 폴더 복사
+COPY dashboards/ /var/lib/grafana/dashboards/
+
+# [수정됨] Grafana 기본 UID(472)와 GID(0, root)를 사용하여 소유권 부여
+RUN chown -R 472:0 /etc/grafana/provisioning /var/lib/grafana/dashboards
+
+# [수정됨] 다시 grafana 유저(472)로 전환
+USER 472

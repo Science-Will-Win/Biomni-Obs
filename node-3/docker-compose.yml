@@ -1,25 +1,30 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # 0. OTel Collector (데이터 수집 및 Node 2의 Langfuse로 라우팅)
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
     user: "0:0"
     command: ["--config=/etc/otelcol-config.yaml"]
+    # (주의: otel-collector도 외부 파일을 못 읽는다면, 이 녀석도 별도로 구워서 Hub에 올려야 할 수 있습니다!)
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol-config.yaml
     ports:
-      - "4317:4317" 
+      - "4317:4317"
       - "4318:4318"
 
-  # 1. Grafana (시각화)
   grafana:
-    image: grafana/grafana:latest
+    image: <본인계정>/biomni-grafana:latest # Docker Hub에 올린 내 이미지 주소!
     container_name: grafana
     ports:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    # DB와 통신하기 위해 이전 답변에서 설정했던 네트워크 (방법 2를 사용했다면)
+    networks:
+      - biomni-net
+    # 볼륨 마운트는 이미 이미지 안에 다 들어있으므로 필요 없습니다!
+
+networks:
+  biomni-net:
+    external: true
