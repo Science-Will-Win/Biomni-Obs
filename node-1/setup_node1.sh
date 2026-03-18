@@ -4,7 +4,7 @@ set -e
 
 WORKSPACE_DIR="/raid/sww"
 WEB_REPO_URL="https://github.com/Science-Will-Win/Biomni-Web.git"
-WEB_BRANCH="aigen"
+WEB_BRANCH="main"
 # 현재 스크립트가 실행된 경로 (node-1 폴더)
 NODE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
