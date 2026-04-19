@@ -37,23 +37,23 @@ services:
     volumes:
       - aigen-pgdata:/var/lib/postgresql/data
 
-  vllm-server:
-    image: vllm/vllm-openai:latest
-    container_name: vllm-server
-    runtime: nvidia
-    ports:
-      - "30000:8000"
-    volumes:
-      - ./models:/app/models
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-    command: >
-      --model /app/models/Ministral-3-3B-Reasoning-2512
-      --served-model-name ministral-reasoning
-      --port 8000
-      --host 0.0.0.0
-      --max-model-len 65536
-    restart: unless-stopped
+  # vllm-server:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: vllm-server
+  #   runtime: nvidia
+  #   ports:
+  #     - "30000:8000"
+  #   volumes:
+  #     - ./models:/app/models
+  #   environment:
+  #     - NVIDIA_VISIBLE_DEVICES=all
+  #   command: >
+  #     --model /app/models/Ministral-3-3B-Reasoning-2512
+  #     --served-model-name ministral-reasoning
+  #     --port 8000
+  #     --host 0.0.0.0
+  #     --max-model-len 65536
+  #   restart: unless-stopped
 
 volumes:
   aigen-pgdata:

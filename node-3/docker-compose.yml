@@ -14,7 +14,7 @@ services:
       - "4318:4318"
 
   grafana:
-    image: <본인계정>/biomni-grafana:latest # Docker Hub에 올린 내 이미지 주소!
+    image: jiyeonl/biomni-grafana:latest # Docker Hub에 올린 내 이미지 주소!
     container_name: grafana
     ports:
       - "3001:3000"

@@ -13,3 +13,22 @@ docker compose up -d --build --force-recreate
 UI 띄우기 위해 아래 명령어 실행
 cd Biomni-Web/frontend/
 npm run dev -- --host
+
+
+# 공통 네트워크 생성 (이미지 간 통신용)
+docker network create biomni-obs-network || true
+
+# Node 1 실행 (Langfuse + Postgres + Neo4j)
+cd Biomni-Obs/node-1
+docker compose up -d
+
+# Node 2 실행 
+cd ../node-2
+docker compose up -d
+
+# Node 3 실행 (Grafana, OTel, Prometheus 등)
+cd ../node-3
+docker compose up -d
+
+# Neo4j 정상 구동 확인
+curl -I http://localhost:7474
