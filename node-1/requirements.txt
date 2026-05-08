@@ -43,7 +43,8 @@ mcp
 nest-asyncio
 
 # ─── Biomni Scientific libs ───
-numpy
+# [수정] numpy 중복 선언 제거 → 2.1로 단일화
+numpy==2.1
 pandas
 scipy
 biopython
@@ -61,7 +62,6 @@ openai
 transformers
 sentencepiece
 tooluniverse
-numpy==2.1
 matplotlib
 statsmodels
 scikit-learn
@@ -72,7 +72,8 @@ jupyter
 notebook
 ipykernel
 pytest
-zarr>=2.0,<3.0
+# [수정] zarr 버전 제약 완화 → cellxgene-census와의 충돌 방지
+zarr
 lazyslide
 mi-googlesearch-python
 
@@ -82,9 +83,10 @@ biopandas
 biotite
 opencv-python
 rdkit
-macs2
-pymc3
-cryosparc-tools
+# [수정] macs2 제거 (Python 3.11 미지원)
+# macs2
+# [수정] pymc3 → pymc (Python 3.11 지원)
+pymc
 lifelines
 scikit-image
 gget
@@ -130,6 +132,8 @@ fair-esm
 nnunet
 nibabel
 nilearn
+# [수정] cryosparc-tools 제거 (라이선스 서버 필요, pip 설치 불가)
+# cryosparc-tools
 
 asyncpg
 psycopg2-binary

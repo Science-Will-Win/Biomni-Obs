@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-ENV UV_CACHE_DIR=/raid/sww/.cache/uv
-ENV PIP_CACHE_DIR=/raid/sww/.cache/pip
-ENV XDG_CACHE_HOME=/raid/sww/.cache
+# [수정] 하드코딩된 /raid/sww 경로 제거 → 컨테이너 내부 경로로 변경
+ENV UV_CACHE_DIR=/root/.cache/uv
+ENV PIP_CACHE_DIR=/root/.cache/pip
+ENV XDG_CACHE_HOME=/root/.cache
 
 RUN conda install -y -c conda-forge -c bioconda \
     python=3.11 \
@@ -22,25 +23,28 @@ RUN conda install -y -c conda-forge -c bioconda \
     && conda clean -afy
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# [수정] macs2 제거 (Python 3.11 미지원), pymc3→pymc 교체, cryosparc-tools 제거
+# 문제 패키지 3개를 sed로 제거한 뒤 설치
+RUN sed -i \
+    -e '/^macs2/d' \
+    -e '/^pymc3/d' \
+    -e '/^cryosparc-tools/d' \
+    requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt
 
 RUN pip install --no-cache-dir "git+https://github.com/YosefLab/popV.git@refs/pull/100/head" \
     && pip install --no-cache-dir "git+https://github.com/pylabrobot/pylabrobot.git" \
     && pip install --no-cache-dir uv \
     && uv pip install transcriptformer --system \
-    && uv tool install arc-state \
+    # [수정] uv tool → uv pip (PATH 문제 방지)
+    && uv pip install arc-state --system \
     && rm -rf /root/.cache/pip /root/.cache/uv
 
 RUN Rscript -e "install.packages(c('ggplot2', 'lme4', 'dplyr', 'tidyr', 'readr', 'stringr', 'Matrix', 'Rcpp', 'devtools', 'remotes', 'harmony', 'WGCNA', 'BiocManager'), repos='https://cran.rstudio.com/')" \
     && Rscript -e "BiocManager::install(c('DESeq2', 'dada2', 'xcms', 'flowCore', 'edgeR', 'limma', 'clusterProfiler', 'impute', 'preprocessCore', 'GO.db', 'AnnotationDbi'), ask=FALSE)"
 
-# RUN mkdir -p /app/biomni_tools/bin \
-#     && wget -O /app/biomni_tools/FastTree.c http://www.microbesonline.org/fasttree/FastTree.c \
-#     && gcc -O3 -finline-functions -funroll-loops -Wall -o /app/biomni_tools/bin/FastTree /app/biomni_tools/FastTree.c -lm \
-#     && rm -f /app/biomni_tools/FastTree.c
-# ENV PATH="/app/biomni_tools/bin:${PATH}"
-
-# [핵심 수정 1] Biomni 레포지토리를 도커 이미지 내부로 직접 클론
 RUN git clone https://github.com/Science-Will-Win/Biomni.git /app/biomni_repo
 
+# [수정] opentelemetry-bootstrap은 base에서도 실행 (최종 이미지에서도 재실행)
 RUN opentelemetry-bootstrap -a install
