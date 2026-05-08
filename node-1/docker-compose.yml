@@ -1,8 +1,21 @@
 version: "3.8"
 
 services:
+  neo4j:
+    image: neo4j:5.12.0
+    container_name: biomni-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/biomnipassword
+
   aigen-backend:
-    image: jiyeonl/biomni-web_backend:latest # [핵심] 도커 허브 이미지 사용
+    build:
+      context: ./backend
+      additional_contexts:
+        - biomni_repo=../Biomni
+    image: jiyeonl/biomni-web_backend
     container_name: aigen-backend
     env_file:
       - .env
@@ -10,19 +23,32 @@ services:
       - PYTHONPATH=/app/biomni_repo:/app/backend_code:$PYTHONPATH
       - BIOMNI_DATA_PATH=/app/data
     volumes:
-      # [핵심] 소스 코드 마운트는 전부 제거! (이미지 안에 있으니까요)
-      # 결과물 저장을 위한 데이터 폴더들만 마운트합니다.
-      - ./data:/app/data
-      - ./uploads:/app/uploads
-      - ./outputs:/app/outputs
-      - ./logs:/app/logs
+      # Biomni source (from aigen_work/Biomni)
+      - ../Biomni:/app/biomni_repo
+      # Backend code (hot-reload)
+      - ./backend:/app/backend_code
+      # Data storage
+      - ./:/app/data
+      - ../uploads:/app/uploads
+      - ../outputs:/app/outputs
+      - ../logs:/app/logs
       - ./reasoning_logs:/app/reasoning_logs
-      - ./models:/app/models
+      # Models directory (for local model folder detection)
+      - ../models:/app/models
+      # Docker socket (for dynamic vLLM container management)
       - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        echo "Installing missing dependencies..."
+        # requirements.txt에 있는 모든 것을 설치하도록 명령 추가
+        pip install -r /app/backend_code/requirements.txt -q
+        ./entrypoint.sh
     ports:
       - "8003:8000"
     depends_on:
       - aigen-db
+      - neo4j
     restart: unless-stopped
 
   aigen-db:
@@ -44,7 +70,7 @@ services:
   #   ports:
   #     - "30000:8000"
   #   volumes:
-  #     - ./models:/app/models
+  #     - ../models:/app/models
   #   environment:
   #     - NVIDIA_VISIBLE_DEVICES=all
   #   command: >
