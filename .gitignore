@@ -5,3 +5,10 @@ tempo-data
 */pgdata
 */__pycache__
 node-1/data
+node-1/biomni_data
+node-1/logs
+node-1/models
+node-1/outputs
+node-1/uploads
+node-1/reasoning_logs
+node-1/backend

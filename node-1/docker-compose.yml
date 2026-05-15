@@ -11,10 +11,6 @@ services:
       - NEO4J_AUTH=neo4j/biomnipassword
 
   aigen-backend:
-    build:
-      context: ./backend
-      additional_contexts:
-        - biomni_repo=../Biomni
     image: jiyeonl/biomni-web_backend
     container_name: aigen-backend
     env_file:
@@ -23,27 +19,14 @@ services:
       - PYTHONPATH=/app/biomni_repo:/app/backend_code:$PYTHONPATH
       - BIOMNI_DATA_PATH=/app/data
     volumes:
-      # Biomni source (from aigen_work/Biomni)
-      - ../Biomni:/app/biomni_repo
-      # Backend code (hot-reload)
-      - ./backend:/app/backend_code
-      # Data storage
+      # 런타임 데이터만 마운트 (이미지에 포함된 코드/레포는 마운트 제거)
       - ./:/app/data
       - ../uploads:/app/uploads
       - ../outputs:/app/outputs
       - ../logs:/app/logs
       - ./reasoning_logs:/app/reasoning_logs
-      # Models directory (for local model folder detection)
       - ../models:/app/models
-      # Docker socket (for dynamic vLLM container management)
       - /var/run/docker.sock:/var/run/docker.sock
-    entrypoint: ["bash", "-c"]
-    command:
-      - |
-        echo "Installing missing dependencies..."
-        # requirements.txt에 있는 모든 것을 설치하도록 명령 추가
-        pip install -r /app/backend_code/requirements.txt -q
-        ./entrypoint.sh
     ports:
       - "8003:8000"
     depends_on:
@@ -62,24 +45,6 @@ services:
       - POSTGRES_DB=aigen
     volumes:
       - aigen-pgdata:/var/lib/postgresql/data
-
-  # vllm-server:
-  #   image: vllm/vllm-openai:latest
-  #   container_name: vllm-server
-  #   runtime: nvidia
-  #   ports:
-  #     - "30000:8000"
-  #   volumes:
-  #     - ../models:/app/models
-  #   environment:
-  #     - NVIDIA_VISIBLE_DEVICES=all
-  #   command: >
-  #     --model /app/models/Ministral-3-3B-Reasoning-2512
-  #     --served-model-name ministral-reasoning
-  #     --port 8000
-  #     --host 0.0.0.0
-  #     --max-model-len 65536
-  #   restart: unless-stopped
 
 volumes:
   aigen-pgdata:
