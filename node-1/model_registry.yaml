@@ -1,4 +1,4 @@
-# Model Registry — 10 models
+# Model Registry — 11 models
 # Token format mapping per model type
 
 models:
@@ -107,7 +107,40 @@ models:
       estimator: "logprob"
       top_logprobs_num: 5
 
+  ckpt0525-remote:
+    type: api
+    provider: vllm
+    display_name: "ckpt0525 Remote"
+    model_name: "ckpt0525"
+    base_url: "https://substitute-protection-lasting-reviewed.trycloudflare.com/v1"
+    max_tokens: 8192
+    use_llm_retrieval: true
+    think_format: null
+    code_execute_format: "<execute>"
+    code_result_format: "<observation>"
+    tool_result_format: "<observation>"
+    solution_format: "<solution>"
+    tool_calls_format: null
+    available_tools_format: "[AVAILABLE_TOOLS]"
+    stop_sequences: ["</execute>", "</solution>", "</observation>"]
+    refusal:
+      enabled: false
+
   # ─── Cloud API Models ───
+  gpt-5.5:
+    type: api
+    provider: openai
+    display_name: "GPT-5.5"
+    think_format: null
+    code_execute_format: "<execute>"
+    code_result_format: "<observation>"
+    tool_result_format: "<observation>"
+    solution_format: null
+    tool_calls_format: null
+    stop_sequences: ["</execute>", "</observation>"]
+    refusal:
+      enabled: false
+
   gpt-4o:
     type: api
     provider: openai

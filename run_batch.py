@@ -109,7 +109,7 @@ def process_single_item(item, logger):
     logger.info(f"▶️ [ID: {instance_id}] 처리 시작... (Task: {task_name})")
     
     unique_session_id = f"batch_{instance_id}_{uuid.uuid4().hex[:6]}"
-    payload = {"message": prompt, "session_id": unique_session_id}
+    payload = {"message": prompt, "session_id": unique_session_id, "mode": "plan"}
     
     is_finally_correct = False
     final_trace_id = ""

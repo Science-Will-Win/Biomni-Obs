@@ -19,13 +19,20 @@ services:
       - PYTHONPATH=/app/biomni_repo:/app/backend_code:$PYTHONPATH
       - BIOMNI_DATA_PATH=/app/data
     volumes:
-      # 런타임 데이터만 마운트 (이미지에 포함된 코드/레포는 마운트 제거)
-      - ./:/app/data
-      - ../uploads:/app/uploads
-      - ../outputs:/app/outputs
-      - ../logs:/app/logs
+      # biomni_data가 저장되는 경로 (node-1/data/)
+      - ./data:/app/data
+      # 런타임 데이터 (node-1 하위)
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+      - ./models:/app/models
       - ./reasoning_logs:/app/reasoning_logs
-      - ../models:/app/models
+      # 사용자가 수정 가능한 설정 파일 (이미지 내부 기본값을 덮어씀)
+      - ./model_registry.yaml:/app/backend_code/model_registry.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 개발용 BE 코드 마운트 추가
+      - ../../Biomni-Web-BE:/app/backend_code
+      - ../../Biomni:/app/biomni_repo
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8003:8000"

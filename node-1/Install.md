@@ -32,3 +32,7 @@ docker compose up -d
 
 # Neo4j 정상 구동 확인
 curl -I http://localhost:7474
+
+
+도커 접속 후 명령어 실행
+python3 run_biomni_test.py train_biological_causality_1000_no_rare_disease_no_screen_gene_no_pharma.json 35
