@@ -1,4 +1,4 @@
-# Model Registry — 11 models
+# Model Registry - 12 models
 # Token format mapping per model type
 
 models:
@@ -113,6 +113,25 @@ models:
     display_name: "ckpt0525 Remote"
     model_name: "ckpt0525"
     base_url: "https://substitute-protection-lasting-reviewed.trycloudflare.com/v1"
+    max_tokens: 8192
+    use_llm_retrieval: true
+    think_format: null
+    code_execute_format: "<execute>"
+    code_result_format: "<observation>"
+    tool_result_format: "<observation>"
+    solution_format: "<solution>"
+    tool_calls_format: null
+    available_tools_format: "[AVAILABLE_TOOLS]"
+    stop_sequences: ["</execute>", "</solution>", "</observation>"]
+    refusal:
+      enabled: false
+
+  ministral-3b-base-remote:
+    type: api
+    provider: vllm
+    display_name: "Ministral 3B Base Remote"
+    model_name: "ministral-3b-base"
+    base_url: "https://hour-ips-wiley-key.trycloudflare.com/v1"
     max_tokens: 8192
     use_llm_retrieval: true
     think_format: null
